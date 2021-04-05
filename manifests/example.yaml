@@ -1,0 +1,77 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  namespace: istio-system
+  name: istio-operator
+spec:
+  components:
+    base:
+      enabled: true
+    cni:
+      enabled: true
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+      k8s:
+        hpaSpec:
+          maxReplicas: 1
+        nodeSelector:
+          ingress-ready: "true"
+        service:
+          type: NodePort
+          ports:
+          - name: http2
+            nodePort: 31380
+            port: 80
+            protocol: TCP
+            targetPort: 8080
+          - name: https
+            nodePort: 31390
+            port: 443
+            protocol: TCP
+            targetPort: 8443
+          - name: tcp
+            nodePort: 31400
+            port: 31400
+            protocol: TCP
+            targetPort: 31400
+          - name: tls
+            nodePort: 31447
+            port: 15443
+            protocol: TCP
+            targetPort: 15443
+        overlays:
+        - apiVersion: policy/v1beta1
+          kind: PodDisruptionBudget
+          name: istio-ingressgateway
+          patches:
+          - path: spec.minAvailable
+            value: 0
+    pilot:
+      enabled: true
+      k8s:
+        hpaSpec:
+          maxReplicas: 1
+        overlays:
+        - apiVersion: policy/v1beta1
+          kind: PodDisruptionBudget
+          name: istiod
+          patches:
+          - path: spec.minAvailable
+            value: 0
+  meshConfig:
+    accessLogFile: "/dev/stdout"
+    accessLogEncoding: "JSON"
+  values:
+    # global:
+      # controlPlaneSecurityEnabled: true
+    cni:
+      excludeNamespaces:
+       - istio-system
+       - kube-system
+    # gateways:
+      # istio-ingressgateway:
+        # sds:
+        #   enabled: true
+    sidecarInjectorWebhook:
+      rewriteAppHTTPProbe: true

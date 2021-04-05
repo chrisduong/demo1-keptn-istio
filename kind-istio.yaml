@@ -1,0 +1,26 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: istio-testing
+nodes:
+- role: control-plane
+  kubeadmConfigPatches: # Enable Port Mapping so that we can reach Ingress Controller with Node Port 
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 31380 # Ingress Gateway HTTP
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 31390 # Ingress Gateway HTTPS
+    hostPort: 443
+    protocol: TCP
+  - containerPort: 31400 # for Ingress Gateway status port
+    hostPort: 15021
+    protocol: TCP
+  - containerPort: 31447 # TODO: TLS what?
+    hostPort: 15443
+    protocol: TCP
+- role: worker
+  image: kindest/node:v1.20.2
