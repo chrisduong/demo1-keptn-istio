@@ -16,11 +16,11 @@ nodes:
   - containerPort: 31390 # Ingress Gateway HTTPS
     hostPort: 443
     protocol: TCP
-  - containerPort: 31400 # for Ingress Gateway status port
-    hostPort: 15021
+  - containerPort: 31400 # the port where sni routing happens
+    hostPort: 31400
     protocol: TCP
   - containerPort: 31447 # TODO: TLS what?
-    hostPort: 15443
+    hostPort: 31447
     protocol: TCP
 - role: worker
   image: kindest/node:v1.20.2
