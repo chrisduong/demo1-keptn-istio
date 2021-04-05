@@ -13,7 +13,7 @@
 ### Create KIND cluster
 
 ```sh
-kind create cluster --config kind.yaml
+kind create cluster --config kind-istio.yaml
 ```
 
 ### Install ISTIO with Istio Operator
@@ -28,7 +28,7 @@ What is [ISTIO Operator](https://github.com/istio/istio/tree/master/operator)
 ```sh
 curl -sL https://istio.io/downloadIstioctl | sh -
 
-export PATH=$PATH:$HOME/.istioctl/bin
+export PATH=$HOME/.istioctl/bin:$PATH
 ```
 
 Install Operator:
@@ -63,6 +63,8 @@ kubectl create ns istio-system
 
 kubectl apply -f manifests/example.yaml
 ```
+
+You need to wait while IstioOperator creating all the pods. 
 
 Verify the Istio installation.
 
@@ -100,4 +102,5 @@ chmod +x configure-istio.sh
 
 ## Thanks to..
 
-<https://www.danielstechblog.io/running-istio-on-kind-kubernetes-in-docker/>
+- <https://www.danielstechblog.io/running-istio-on-kind-kubernetes-in-docker/>
+- [Modern continuous delivery on Kubernetes for developers](https://dev.to/gabrieltanner/modern-continuous-delivery-on-kubernetes-for-developers-5chf)
