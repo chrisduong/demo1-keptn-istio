@@ -150,6 +150,74 @@ content-length: 3
 x-envoy-upstream-service-time: 0
 ```
 
+##### 7. Connect your Keptn CLI to the Keptn installation
+
+```sh
+KEPTN_ENDPOINT=http://localhost/api
+KEPTN_API_TOKEN=$(kubectl get secret keptn-api-token -n keptn -ojsonpath='{.data.keptn-api-token}' | base64 --decode)
+```
+
+Use this stored information and authenticate the CLI.
+
+```sh
+keptn auth --endpoint=$KEPTN_ENDPOINT --api-token=$KEPTN_API_TOKEN
+```
+
+##### 8. Create your first project
+
+```sh
+git clone --branch release-0.8.0 https://github.com/keptn/examples.git --single-branch
+```
+
+NOTE: we create a fork.
+
+Create the project.
+
+```sh
+keptn create project sockshop --shipyard=./shipyard.yaml --git-user=$GIT_USER --git-token=$GIT_TOKEN --git-remote-url=$GIT_REMOTE_URL
+```
+
+Get the credentials generated for Bridge (*"http://localhost/bridge"*)
+
+```sh
+keptn configure bridge --output
+```
+
+##### 9. Onboard first microservice
+
+```sh
+keptn onboard service carts --project=sockshop --chart=./carts
+
+keptn add-resource --project=sockshop --stage=dev --service=carts --resource=jmeter/basiccheck.jmx --resourceUri=jmeter/basiccheck.jmx
+
+keptn add-resource --project=sockshop --stage=staging --service=carts --resource=jmeter/load.jmx --resourceUri=jmeter/load.jmx
+```
+
+Since the carts service requires a mongodb database, a second service needs to be onboarded.
+
+```sh
+keptn onboard service carts-db --project=sockshop --chart=./carts-db
+```
+
+**TODO:** check why the Jmeter `basiccheck.jmx` failed.
+
+##### 10. Deploy first build with Keptn
+
+After onboarding the services, a built artifact of each service can be deployed.
+
+1. Deploy the carts-db service by executing the keptn trigger delivery command:
+
+```sh
+keptn trigger delivery --project=sockshop --service=carts-db --image=docker.io/mongo --tag=4.2.2 --sequence=delivery-direct
+```
+
+2. Deploy the carts service by specifying the built artifact, which is stored on DockerHub and tagged with version 0.12.1:
+
+```sh
+keptn trigger delivery --project=sockshop --service=carts --image=docker.io/keptnexamples/carts --tag=0.12.1
+```
+
+
 ### b. Install with ISTIOCTL
 
 ```sh
@@ -186,3 +254,4 @@ chmod +x configure-istio.sh
 
 - <https://www.danielstechblog.io/running-istio-on-kind-kubernetes-in-docker/>
 - [Modern continuous delivery on Kubernetes for developers](https://dev.to/gabrieltanner/modern-continuous-delivery-on-kubernetes-for-developers-5chf)
+- <https://github.com/grabnerandi/keptn07__simplenode>
