@@ -16,7 +16,7 @@
 kind create cluster --config kind-istio.yaml
 ```
 
-### Install ISTIO with Istio Operator
+### a. Install ISTIO with Istio Operator
 
 What is [ISTIO Operator](https://github.com/istio/istio/tree/master/operator)
 
@@ -71,7 +71,86 @@ Verify the Istio installation.
 ```sh
 ```
 
-### Install with ISTIOCTL
+#### Configure Keptn with NodePort
+
+<https://tutorials.keptn.sh/tutorials/keptn-full-tour-prometheus-08/index.html>
+
+##### Install Keptn
+
+```sh
+keptn install --endpoint-service-type=ClusterIP --use-case=continuous-delivery
+```
+
+##### Configure Keptn
+
+
+We don't need to create the traditional Ingress, we create the [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/) only.
+
+##### Determining the ingress IP and ports
+
+SKIP this as we had done the PortMapping for Kind nodes.
+
+##### Configuring ingress using an Istio gateway
+
+An ingress [Gateway](https://istio.io/latest/docs/reference/config/networking/gateway/) describes a load balancer operating at the edge of the mesh that receives incoming HTTP/TCP connections.
+
+```sh
+kubectl apply -f - <<EOF
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: keptn-public-gateway
+  namespace: keptn
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+EOF
+```
+
+Configure Virtual Gateway
+
+```sh
+kubectl apply -f - <<EOF
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: keptn-public-gateway
+  namespace: keptn
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - keptn-public-gateway
+  http:
+  - route:
+    - destination:
+        port:
+          number: 80
+        host: api-gateway-nginx
+EOF
+```
+
+Verify Keptn health.
+
+```console
+$ curl -s -I "http://localhost/nginx-health"
+
+HTTP/1.1 200 OK
+server: istio-envoy
+date: Mon, 05 Apr 2021 19:25:12 GMT
+content-type: text/plain
+content-length: 3
+x-envoy-upstream-service-time: 0
+```
+
+### b. Install with ISTIOCTL
 
 ```sh
 curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.9.2 sh -
@@ -90,6 +169,9 @@ In this case you will install Keptn by using the continuous-delivery use-case.
 ```sh
 keptn install --endpoint-service-type=ClusterIP --use-case=continuous-delivery
 ```
+
+
+### Configure Keptn
 
 Configure Keptn with ISTIO:
 
