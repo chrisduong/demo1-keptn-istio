@@ -71,7 +71,7 @@ You need to wait while IstioOperator creating all the pods.
 Verify the Istio installation.
 
 ```sh
-
+istioctl verify-install -f manifests/example.yaml
 ```
 
 #### Configure Keptn with NodePort
@@ -230,6 +230,10 @@ curl -o configure-istio.sh https://raw.githubusercontent.com/keptn/examples/rele
 chmod +x configure-istio.sh
 ./configure-istio.sh
 ```
+
+## Noticed points
+
+- Keptn Demo used the customised Prometheus.
 
 ## Thanks to..
 
