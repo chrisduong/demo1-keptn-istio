@@ -10,13 +10,15 @@
 
 ## Installation
 
+Scenario: we will do **local development** only, and we use NodePort LoadBalancer.
+
 ### Create KIND cluster
 
 ```sh
 kind create cluster --config kind-istio.yaml
 ```
 
-### a. Install ISTIO with Istio Operator
+### Install ISTIO with Istio Operator
 
 What is [ISTIO Operator](https://github.com/istio/istio/tree/master/operator)
 
@@ -69,13 +71,14 @@ You need to wait while IstioOperator creating all the pods.
 Verify the Istio installation.
 
 ```sh
+
 ```
 
 #### Configure Keptn with NodePort
 
 <https://tutorials.keptn.sh/tutorials/keptn-full-tour-prometheus-08/index.html>
 
-##### Install Keptn
+##### 1. Install Keptn
 
 ```sh
 keptn install --endpoint-service-type=ClusterIP --use-case=continuous-delivery
@@ -216,28 +219,6 @@ keptn trigger delivery --project=sockshop --service=carts-db --image=docker.io/m
 ```sh
 keptn trigger delivery --project=sockshop --service=carts --image=docker.io/keptnexamples/carts --tag=0.12.1
 ```
-
-
-### b. Install with ISTIOCTL
-
-```sh
-curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.9.2 sh -
-
-./istio-1.9.2/bin/istioctl install
-```
-
-Install Keptn v0.8.1
-
-```sh
-curl -sL https://get.keptn.sh | KEPTN_VERSION=0.8.1 bash
-```
-
-In this case you will install Keptn by using the continuous-delivery use-case.
-
-```sh
-keptn install --endpoint-service-type=ClusterIP --use-case=continuous-delivery
-```
-
 
 ### Configure Keptn
 
